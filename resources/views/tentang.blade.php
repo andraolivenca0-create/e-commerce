@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    {{-- Encoding Caracter --}}
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    {{-- Responsive Untuk mobile --}}
+
+    <title>Tentang Kami</title>
+
+    <style>
+        body {
+            font-family: system-ui, -apple-system, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+        }
+        h1 {
+            color: #4f46e5;
+        }
+    </style>
+</head>
+<body>
+    <h1>Tentang Toko Mifzz</h1>
+    <p>Seleamat datang di toko online kami.</p>
+    <p>Dibuat dengan Hati menggunakan Laravel.</p>
+    <p>Waktu saat ini: {{ now()->format('d M Y,H:i:s') }}</p>
+    <p><a href="/">Kembali Ke Home</a></p>
+
+    <a href="{{ route('produk.detail', ['id' => 1]) }}">Lihat Produk 1</a><br>
+    <a href="{{ route('produk.detail', ['id' => 1]) }}">Lihat Produk 2</a>
+    
+</body>
+</html>
