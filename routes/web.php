@@ -18,6 +18,7 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\WishlistController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\MidtransNotificationController;
+use App\Http\Controllers\PaymentController;
 // ================================================
 // HALAMAN PUBLIK (Tanpa Login)
 // ================================================

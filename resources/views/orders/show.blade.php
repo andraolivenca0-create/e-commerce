@@ -109,7 +109,7 @@
                     </address>
                 </div>
 
-                {{-- Tombol Bayar (hanya jika pending) --}}
+                {{-- Tombol Bayar (hanya jika pending) --}} 
                 @if($order->status === 'pending' && $order->snap_token)
                 <div class="card-body bg-primary bg-opacity-10 border-top text-center">
                     <p class="text-muted mb-4">

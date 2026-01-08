@@ -3,116 +3,131 @@
 @section('title', 'Detail Produk')
 
 @section('content')
-<div class="row justify-content-center">
-    <div class="col-lg-12">
+<div class="container-fluid">
 
-        {{-- Header --}}
-        <div class="d-flex justify-content-between align-items-center mb-4">
-            <h2 class="h3 mb-0 fw-bold text-info">
-                <i class="bi bi-eye me-1"></i> Detail Produk
-            </h2>
-            <div class="d-flex gap-2">
-                <a href="{{ route('admin.products.edit', $product) }}" class="btn btn-warning text-white">
-                    <i class="bi bi-pencil-square me-1"></i> Edit
-                </a>
-                <a href="{{ route('admin.products.index') }}" class="btn btn-outline-secondary">
-                    <i class="bi bi-arrow-left"></i> Kembali
-                </a>
-            </div>
+    {{-- HEADER --}}
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="h4 fw-bold mb-1">
+                <i class="bi bi-box-seam me-1"></i>
+                Detail Produk
+            </h1>
+            <p class="text-muted mb-0">
+                Informasi lengkap produk
+            </p>
         </div>
 
-        <div class="row g-4">
-
-            {{-- ================= IMAGES ================= --}}
-            <div class="col-lg-5">
-                <div class="card shadow-sm border-0">
-                    <div class="card-body p-3">
-
-                        {{-- Primary Image --}}
-                        <img src="{{ asset('storage/'.$product->primaryImage?->image_path) }}"
-                            class="img-fluid rounded mb-3 w-100" style="object-fit:cover;max-height:320px">
-
-                        {{-- Gallery --}}
-                        <div class="row g-2">
-                            @foreach($product->images as $image)
-                            <div class="col-4">
-                                <img src="{{ asset('storage/'.$image->image_path) }}" class="img-fluid rounded border"
-                                    style="object-fit:cover;height:90px;width:100%">
-                            </div>
-                            @endforeach
-                        </div>
-
-                    </div>
-                </div>
-            </div>
-
-            {{-- ================= PRODUCT INFO ================= --}}
-            <div class="col-lg-7">
-                <div class="card shadow-sm border-0 h-100">
-                    <div class="card-body p-4">
-
-                        <h4 class="fw-bold mb-1">
-                            {{ $product->name }}
-                        </h4>
-
-                        <p class="text-muted mb-2">
-                            <i class="bi bi-tags me-1"></i>
-                            {{ $product->category->name }}
-                        </p>
-
-                        {{-- Price --}}
-                        <h5 class="text-primary fw-bold mb-3">
-                            Rp {{ number_format($product->discount_price, 0, ',', '.') }}
-                            @if($product->discount_price)
-                            <span class="text-muted fs-6 text-decoration-line-through ms-2">
-                                Rp {{ number_format($product->price, 0, ',', '.') }}
-                            </span>
-                            @endif
-                        </h5>
-
-                        {{-- Status --}}
-                        <div class="mb-3 d-flex gap-2">
-                            <span class="badge bg-{{ $product->is_active ? 'success' : 'secondary' }}">
-                                {{ $product->is_active ? 'Aktif' : 'Nonaktif' }}
-                            </span>
-
-                            @if($product->is_featured)
-                            <span class="badge bg-warning text-dark">
-                                <i class="bi bi-star-fill me-1"></i> Unggulan
-                            </span>
-                            @endif
-                        </div>
-
-                        <hr>
-
-                        {{-- Description --}}
-                        <p class="mb-4">
-                            {{ $product->description ?: '-' }}
-                        </p>
-
-                        {{-- Meta --}}
-                        <div class="row">
-                            <div class="col-md-4 mb-2">
-                                <strong>Stok</strong>
-                                <div>{{ $product->stock }}</div>
-                            </div>
-
-                            <div class="col-md-4 mb-2">
-                                <strong>Berat</strong>
-                                <div>{{ $product->weight }} gram</div>
-                            </div>
-
-                            <div class="col-md-4 mb-2">
-                                <strong>Dibuat</strong>
-                                <div>{{ $product->created_at->format('d M Y') }}</div>
-                            </div>
-                        </div>
-
-                    </div>
-                </div>
-            </div>
-
+        <div class="d-flex gap-2">
+            <a href="{{ route('admin.products.edit', $product) }}" class="btn btn-warning text-white">
+                <i class="bi bi-pencil-square"></i> Edit
+            </a>
+            <a href="{{ route('admin.products.index') }}" class="btn btn-outline-secondary">
+                <i class="bi bi-arrow-left"></i> Kembali
+            </a>
         </div>
     </div>
+
+    <div class="row g-4">
+
+        {{-- GALERI GAMBAR --}}
+        <div class="col-lg-5">
+            <div class="card shadow-sm border-0">
+                <div class="card-body text-center">
+
+                    {{-- PRIMARY IMAGE --}}
+                    <img
+                        src="{{ $product->primaryImage
+                            ? $product->primaryImage->image_url
+                            : asset('img/no-image.png') }}"
+                        class="img-fluid rounded mb-3"
+                        style="max-height:300px; object-fit:contain"
+                    >
+
+                    {{-- THUMBNAILS --}}
+                    @if($product->images->count())
+                        <div class="d-flex justify-content-center gap-2 flex-wrap">
+                            @foreach($product->images as $image)
+                                <img
+                                    src="{{ $image->image_url }}"
+                                    class="rounded border"
+                                    width="60"
+                                    height="60"
+                                    style="object-fit:cover"
+                                >
+                            @endforeach
+                        </div>
+                    @endif
+
+                </div>
+            </div>
+        </div>
+
+        {{-- DETAIL PRODUK --}}
+        <div class="col-lg-7">
+            <div class="card shadow-sm border-0">
+                <div class="card-body">
+
+                    <h3 class="fw-bold mb-3">
+                        {{ $product->name }}
+                    </h3>
+
+                    {{-- STATUS --}}
+                    <p class="mb-3">
+                        @if($product->is_active)
+                            <span class="badge bg-success">
+                                <i class="bi bi-check-circle"></i> Aktif
+                            </span>
+                        @else
+                            <span class="badge bg-secondary">
+                                <i class="bi bi-x-circle"></i> Nonaktif
+                            </span>
+                        @endif
+                    </p>
+
+                    <hr>
+
+                    {{-- INFO --}}
+                    <div class="row mb-3">
+                        <div class="col-sm-4 text-muted">
+                            <i class="bi bi-tags"></i> Kategori
+                        </div>
+                        <div class="col-sm-8 fw-semibold">
+                            {{ $product->category->name ?? '-' }}
+                        </div>
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-sm-4 text-muted">
+                            <i class="bi bi-cash-stack"></i> Harga
+                        </div>
+                        <div class="col-sm-8 fw-semibold">
+                            Rp {{ number_format($product->discount_price ?? $product->price, 0, ',', '.') }}
+                        </div>
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-sm-4 text-muted">
+                            <i class="bi bi-box"></i> Stok
+                        </div>
+                        <div class="col-sm-8 fw-semibold">
+                            {{ $product->stock }}
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-sm-4 text-muted">
+                            <i class="bi bi-info-circle"></i> Deskripsi
+                        </div>
+                        <div class="col-sm-8">
+                            {!! nl2br(e($product->description ?? '-')) !!}
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+    </div>
+
 </div>
 @endsection

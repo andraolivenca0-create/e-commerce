@@ -8,6 +8,10 @@
   <link rel="shortcut icon" type="image/png" href="{{asset('/assets/images/logos/favicon.png')}}" />
   <link rel="stylesheet" href="{{asset('/assets/css/styles.min.css')}}" />
   @stack('styles')
+
+  <!-- Bootstrap Icons CSS -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+
 </head>
 
 <body>

@@ -1,5 +1,4 @@
 <?php
-// app/Http/Controllers/Admin/CategoryController.php
 
 namespace App\Http\Controllers\Admin;
 
@@ -16,108 +15,126 @@ class CategoryController extends Controller
      */
     public function index()
     {
-        // Mengambil data kategori dengan pagination.
-        // withCount('products'): Menghitung jumlah produk di setiap kategori.
-        // Teknik ini jauh lebih efisien daripada memanggil $category->products->count() di view (N+1 Problem).
         $categories = Category::withCount('products')
-            ->latest()      // Urutkan dari yang terbaru (created_at desc)
-            ->paginate(10); // Batasi 10 item per halaman
+            ->latest()
+            ->paginate(10);
 
         return view('admin.categories.index', compact('categories'));
     }
 
     /**
-     * Menyimpan kategori baru ke database.
+     * Menyimpan kategori baru.
      */
     public function store(Request $request)
     {
-        // 1. Validasi Input
         $validated = $request->validate([
-            // 'unique:categories': Pastikan nama belum dipakai di tabel categories
-            'name'        => 'required|string|max:100|unique:categories',
+            'name'        => 'required|string|max:100|unique:categories,name',
             'description' => 'nullable|string|max:500',
-            // Validasi file gambar (maks 1MB)
-            'image'       => 'nullable|image|max:1024',
-            'is_active'   => 'boolean',
+            'image'       => 'nullable|image|mimes:jpg,jpeg,png,webp|max:1024',
         ]);
 
-        // 2. Handle Upload Gambar (Jika ada)
+        /* =========================
+           HANDLE CHECKBOX
+        ========================= */
+        $validated['is_active'] = $request->boolean('is_active');
+
+        /* =========================
+           UPLOAD GAMBAR
+        ========================= */
         if ($request->hasFile('image')) {
-            // store('categories', 'public') akan menyimpan file di: storage/app/public/categories
-            // dan mengembalikan path file tersebut.
             $validated['image'] = $request->file('image')
                 ->store('categories', 'public');
         }
 
-        // 3. Generate Slug Otomatis
-        // Slug digunakan untuk URL yang SEO-friendly.
-        // Contoh: "Elektronik Murah" -> "elektronik-murah"
-        $validated['slug'] = Str::slug($validated['name']);
+        /* =========================
+           SLUG UNIK & AMAN
+        ========================= */
+        $validated['slug'] = $this->generateUniqueSlug($validated['name']);
 
-        // 4. Simpan ke Database
         Category::create($validated);
 
         return back()->with('success', 'Kategori berhasil ditambahkan!');
     }
 
     /**
-     * Memperbarui data kategori.
+     * Update kategori.
      */
     public function update(Request $request, Category $category)
     {
-        // 1. Validasi Input
         $validated = $request->validate([
-            // PENTING: Pada validasi unique saat update, kita harus mengecualikan ID kategori ini sendiri.
-            // Format: unique:table,column,except_id
-            // Jika tidak dikecualikan, Laravel akan menganggap nama ini duplikat (karena sudah ada di DB milik record ini sendiri).
             'name'        => 'required|string|max:100|unique:categories,name,' . $category->id,
             'description' => 'nullable|string|max:500',
-            'image'       => 'nullable|image|max:1024',
-            'is_active'   => 'boolean',
+            'image'       => 'nullable|image|mimes:jpg,jpeg,png,webp|max:1024',
         ]);
 
-        // 2. Handle Ganti Gambar
+        /* =========================
+           HANDLE CHECKBOX
+        ========================= */
+        $validated['is_active'] = $request->boolean('is_active');
+
+        /* =========================
+           GANTI GAMBAR
+        ========================= */
         if ($request->hasFile('image')) {
-            // Hapus gambar lama dulu agar tidak menumpuk sampah file di server (Garbage Collection manual).
             if ($category->image) {
                 Storage::disk('public')->delete($category->image);
             }
-            // Simpan gambar baru
+
             $validated['image'] = $request->file('image')
                 ->store('categories', 'public');
         }
 
-        // 3. Update Slug jika nama berubah
-        // Selalu update slug agar sesuai dengan nama terbaru kategori.
-        $validated['slug'] = Str::slug($validated['name']);
+        /* =========================
+           UPDATE SLUG
+        ========================= */
+        $validated['slug'] = $this->generateUniqueSlug(
+            $validated['name'],
+            $category->id
+        );
 
-        // 4. Update data di database
         $category->update($validated);
 
         return back()->with('success', 'Kategori berhasil diperbarui!');
     }
 
     /**
-     * Menghapus kategori.
+     * Hapus kategori.
      */
     public function destroy(Category $category)
     {
-        // 1. Safeguard (Pencegahan)
-        // Jangan hapus kategori jika masih ada produk di dalamnya.
-        // Ini mencegah produk menjadi "yatim piatu" (orphan data) yang tidak punya kategori.
         if ($category->products()->exists()) {
-            return back()->with('error',
-                'Kategori tidak dapat dihapus karena masih memiliki produk. Silahkan pindahkan atau hapus produk terlebih dahulu.');
+            return back()->with(
+                'error',
+                'Kategori tidak dapat dihapus karena masih memiliki produk.'
+            );
         }
 
-        // 2. Hapus file gambar fisik dari storage
         if ($category->image) {
             Storage::disk('public')->delete($category->image);
         }
 
-        // 3. Hapus record dari database
         $category->delete();
 
         return back()->with('success', 'Kategori berhasil dihapus!');
+    }
+
+    /**
+     * Generate slug unik.
+     */
+    private function generateUniqueSlug(string $name, ?int $ignoreId = null): string
+    {
+        $slug = Str::slug($name);
+        $original = $slug;
+        $counter = 1;
+
+        while (
+            Category::where('slug', $slug)
+                ->when($ignoreId, fn ($q) => $q->where('id', '!=', $ignoreId))
+                ->exists()
+        ) {
+            $slug = $original . '-' . $counter++;
+        }
+
+        return $slug;
     }
 }
