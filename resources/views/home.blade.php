@@ -8,13 +8,108 @@ FUNGSI: Halaman utama website
 @section('title', 'Beranda')
 
 @section('content')
+
+{{-- Animasi Background --}}
+<div class="stars" id="stars"></div>
+<div class="asteroids" id="asteroids"></div>
+
+<style>
+    /* Background bintang dan asteroid */
+    body {
+        position: relative;
+        overflow-x: hidden;
+        background: radial-gradient(#000014, #0d0d2b);
+        color: #fff;
+    }
+
+    .stars, .asteroids {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        pointer-events: none;
+        z-index: 0;
+    }
+
+    .star {
+        position: absolute;
+        background: radial-gradient(white, rgba(255,255,255,0));
+        border-radius: 50%;
+        width: 2px;
+        height: 2px;
+        opacity: 0.8;
+        animation: twinkle 5s infinite;
+    }
+
+    @keyframes twinkle {
+        0%, 100% { opacity: 0.2; }
+        50% { opacity: 1; }
+    }
+
+    .asteroid {
+        position: absolute;
+        width: 20px;
+        height: 20px;
+        background: gray;
+        border-radius: 50%;
+        box-shadow: 0 0 10px rgba(255,255,255,0.2);
+        animation: asteroidMove linear infinite;
+    }
+
+    @keyframes asteroidMove {
+        0% { transform: translateY(-50px) translateX(0) rotate(0deg); opacity: 0; }
+        50% { opacity: 1; }
+        100% { transform: translateY(120vh) translateX(200px) rotate(360deg); opacity: 0; }
+    }
+
+    /* Hero Section Modern */
+    section.bg-primary {
+        position: relative;
+        z-index: 1;
+        background: linear-gradient(135deg, #1f1f47, #0f0f23);
+    }
+
+    section.bg-primary h1 {
+        text-shadow: 0 0 20px #00f6ff, 0 0 40px #00f6ff;
+    }
+
+    section.bg-primary p {
+        font-size: 1.2rem;
+        color: #c0c0ff;
+    }
+
+    .btn-light {
+        background: #00f6ff;
+        color: #0a0a0a;
+        font-weight: 600;
+        transition: 0.3s;
+    }
+
+    .btn-light:hover {
+        background: #00d4ff;
+        color: #fff;
+    }
+
+    /* Cards Modern */
+    .card {
+        border-radius: 15px;
+        transition: transform 0.3s, box-shadow 0.3s;
+    }
+
+    .card:hover {
+        transform: translateY(-10px);
+        box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    }
+</style>
+
 {{-- Hero Section --}}
 <section class="bg-primary text-white py-5">
     <div class="container">
         <div class="row align-items-center">
             <div class="col-lg-6">
                 <h1 class="display-4 fw-bold mb-3">
-                    Belanja Online Mudah & Terpercaya
+                    Anugerah jaya Elektronik
                 </h1>
                 <p class="lead mb-4">
                     Temukan berbagai produk berkualitas dengan harga terbaik.
@@ -117,4 +212,31 @@ FUNGSI: Halaman utama website
         </div>
     </div>
 </section>
+
+{{-- JavaScript Animasi Bintang dan Asteroid --}}
+<script>
+    // Membuat bintang
+    const starsContainer = document.getElementById('stars');
+    for(let i = 0; i < 150; i++) {
+        const star = document.createElement('div');
+        star.classList.add('star');
+        star.style.top = Math.random() * 100 + 'vh';
+        star.style.left = Math.random() * 100 + 'vw';
+        star.style.width = star.style.height = Math.random() * 2 + 1 + 'px';
+        starsContainer.appendChild(star);
+    }
+
+    // Membuat asteroid
+    const asteroidsContainer = document.getElementById('asteroids');
+    for(let i = 0; i < 10; i++) {
+        const asteroid = document.createElement('div');
+        asteroid.classList.add('asteroid');
+        asteroid.style.top = Math.random() * -100 + 'px';
+        asteroid.style.left = Math.random() * 100 + 'vw';
+        asteroid.style.width = asteroid.style.height = (Math.random() * 20 + 10) + 'px';
+        asteroid.style.animationDuration = (5 + Math.random() * 10) + 's';
+        asteroidsContainer.appendChild(asteroid);
+    }
+</script>
+
 @endsection

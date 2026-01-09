@@ -231,7 +231,6 @@
                     <label class="form-check-label">Langsung Aktif</label>
                 </div>
             </div>
-
             <div class="modal-footer bg-light">
                 <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Batal</button>
                 <button type="submit" class="btn btn-primary">
